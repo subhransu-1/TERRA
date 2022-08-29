@@ -1,0 +1,22 @@
+version: 2.1
+orbs:
+  aws-terragrunt: smarshorbs/aws-terragrunt@2.2.0
+jobs:
+  terraform:
+    executor: aws-terragrunt/default
+    steps:
+      - aws-terragrunt/set-up:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          aws-region: AWS_REGION
+          tf-version: 0.13.5
+      - run: echo "namespace=\"$NAMESPACE\"" >> ./infra/common/terraform.tfvars
+      - run: echo "profile=\"default\"" >> ./infra/common/terraform.tfvars
+      - run: cd ./infra && terragrunt apply-all --terragrunt-non-interactive
+workflows:
+  terraform:
+    jobs:
+      - terraform:
+          context:
+            - Dev
+
